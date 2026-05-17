@@ -1,0 +1,16 @@
+{
+    "name": "kg/phpmvcframework",
+    "autoload": {
+        "psr-4": {
+            "Kg\\Phpmvcframework\\": "src/",
+            "app\\": "./"
+        }
+    },
+    "authors": [
+        {
+            "name": "Kagiso Mabusela",
+            "email": "93732213+ThePhoenix911@users.noreply.github.com"
+        }
+    ],
+    "require": {}
+}

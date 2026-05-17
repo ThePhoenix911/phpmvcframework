@@ -1,0 +1,112 @@
+<?php
+
+
+namespace app\core;
+
+class Router
+{
+     public Request $request;
+     public Response $response;
+
+     // this stores a set of instructions that we'll execute based on the users request
+    // the GET method is when the user wants to see something
+    //  the POST method is when the want to store something
+    protected array $routes = [];
+
+    public function __construct(Request $request, Response $response)
+    {
+        // Provides us simplified information about the client's request
+        $this->request = $request;
+
+        $this->response = $response;
+    }
+
+    // Stores instructions about what needs to happen if the user wants to read something from a specific path
+    public function get($path, $callback)
+    {
+        // The callback function has all the instructions of how to provide the required user content
+        $this->routes['get'][$path] = $callback;
+    }
+
+    public function post($path, $callback)
+    {
+        $this->routes['post'][$path] = $callback;
+    }
+
+
+    // Looks at what the user wants and determines appropriate action
+    // From adding new furniture, buying extra land, or rejecting the user's ridiculous request
+    public function resolve()
+    {
+        // Where does the user want to go?
+        $path = $this->request->getPath();
+
+        // What does he want to do?
+        $method = $this->request->getMethod();
+
+        // Since the user want to go to this path and do this, call this function
+        $callback = $this->routes[$method][$path] ?? false;
+
+        // If there's no function associated with this path and method, that means the user is drunk
+        if($callback === false)
+        {
+            $this->response->setStatusCode(404);
+            return $this->renderView('_404');
+        }
+
+
+        // If it is a string that means we only need to update the content
+        // In this instance, it means we need to add new furniture before deploying to the public
+        if(is_string($callback))
+        {
+            // returns an RDP with updated furniture
+            return $this->renderView($callback);
+        }
+
+        // If it is not a string that means, no content needs to be updated
+        // Analogy: it has nothing to do with replacing old furniture
+        // Maybe the user wants to buy a land or something
+        return call_user_func($callback);
+    }
+
+    // Replaces old furniture with the new furniture
+    // Return the report that the RDP is ready to be deployed for use
+    public function renderView($view)
+    {
+        // Layout = An RDP
+        $layoutContent = $this->layoutContent();
+
+        // View = new furniture for the RDP
+        $viewContent = $this->renderOnlyView($view);
+
+        // Go into the RDP house, search for the old furniture and replace with the new one
+        // Return the RDP with the new furniture - the RDP's furniture has been updated
+        return str_replace('{{content}}', $viewContent, $layoutContent);
+
+    }
+
+    public function renderContent($viewContent)
+    {
+        $layoutContent = $this->layoutContent();
+        // instead of replacing the furniture, we put a notice box in place of the furniture
+        // stating that there's no furniture for replacing
+        return str_replace('{{content}}', $viewContent, $layoutContent);
+    }
+
+    // Return the RDP but do not release it to the public until we have installed new furniture
+    protected function layoutContent()
+    {
+        ob_start();
+        include_once Application::$ROOT_DIR . "/views/layouts/main.php";
+        return ob_get_clean();
+    }
+
+    // Add the new furniture but do not show it to the public until it is inside the RDP house, so keep it covered
+    protected function renderOnlyView($view)
+    {
+        ob_start();
+        include_once Application::$ROOT_DIR . "/views/$view.php";
+        return ob_get_clean();
+    }
+
+}
