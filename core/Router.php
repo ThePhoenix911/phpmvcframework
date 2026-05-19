@@ -67,6 +67,7 @@ class Router
         {
             // If the callback is an array, it means it's a [ControllerClass, 'methodName']
             // We must convert the string 'SiteController' into a real Object first
+            // This allows us to use the $this->render method inside the SiteController class since it has been instantiated
             $callback[0] = new $callback[0]();
         }
 
@@ -79,13 +80,13 @@ class Router
 
     // Replaces old furniture with the new furniture
     // Return the report that the RDP is ready to be deployed for use
-    public function renderView($view)
+    public function renderView($view, $params = [])
     {
         // Layout = An RDP
         $layoutContent = $this->layoutContent();
 
         // View = new furniture for the RDP
-        $viewContent = $this->renderOnlyView($view);
+        $viewContent = $this->renderOnlyView($view, $params);
 
         // Go into the RDP house, search for the old furniture and replace with the new one
         // Return the RDP with the new furniture - the RDP's furniture has been updated
@@ -110,8 +111,12 @@ class Router
     }
 
     // Add the new furniture but do not show it to the public until it is inside the RDP house, so keep it covered
-    protected function renderOnlyView($view)
+    protected function renderOnlyView($view, $params)
     {
+        foreach ($params as $key => $value)
+        {
+            $$key = $value;
+        }
         ob_start();
         include_once Application::$ROOT_DIR . "/views/$view.php";
         return ob_get_clean();

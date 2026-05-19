@@ -34,4 +34,18 @@ class Request
        {
             return strtolower($_SERVER['REQUEST_METHOD']);
        }
+
+       public function getBody()
+       {
+           $body = [];
+           if($this->getMethod() === 'get')
+           {
+               foreach ($_GET as $key => $value)
+               {
+                   $body[$key] = filter_input(INPUT_GET, $key, FILTER_SANITIZE_SPECIAL_CHARS);
+               }
+           }
+
+           return $body;
+       }
 }
