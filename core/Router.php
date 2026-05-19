@@ -42,7 +42,7 @@ class Router
         $path = $this->request->getPath();
 
         // What does he want to do?
-        $method = $this->request->getMethod();
+        $method = $this->request->method();
 
         // Since the user want to go to this path and do this, call this function
         $callback = $this->routes[$method][$path] ?? false;
@@ -75,6 +75,8 @@ class Router
         // Analogy: it has nothing to do with replacing old furniture
         // Maybe the user wants to buy a land or something
         /* execute the action and pass the request data to it */
+        // call_user_func accepts the 2nd, 3rd, etc. arguments to be passed as the arguments of the $callback function
+        // So basically, we are calling the $callback function and passing the '$this->>request' as its argument
         return call_user_func($callback, $this->request);
     }
 
