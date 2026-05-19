@@ -63,10 +63,18 @@ class Router
             return $this->renderView($callback);
         }
 
+        if(is_array($callback))
+        {
+            // If the callback is an array, it means it's a [ControllerClass, 'methodName']
+            // We must convert the string 'SiteController' into a real Object first
+            $callback[0] = new $callback[0]();
+        }
+
         // If it is not a string that means, no content needs to be updated
         // Analogy: it has nothing to do with replacing old furniture
         // Maybe the user wants to buy a land or something
-        return call_user_func($callback);
+        /* execute the action and pass the request data to it */
+        return call_user_func($callback, $this->request);
     }
 
     // Replaces old furniture with the new furniture
