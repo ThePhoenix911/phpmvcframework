@@ -9,6 +9,7 @@ class AuthController extends Controller
 {
     public function login()
     {
+        $this->setlayout('auth');
        return $this->render('login');
     }
 
@@ -19,6 +20,7 @@ class AuthController extends Controller
             return "handle submitted data";
         }
 
+        $this->setlayout('auth');
         return $this->render('register');
     }
 }

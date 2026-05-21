@@ -68,7 +68,8 @@ class Router
             // If the callback is an array, it means it's a [ControllerClass, 'methodName']
             // We must convert the string 'SiteController' into a real Object first
             // This allows us to use the $this->render method inside the SiteController class since it has been instantiated
-            $callback[0] = new $callback[0]();
+            Application::$app->controller = new $callback[0]();
+            $callback[0] = Application::$app->controller;
         }
 
         // If it is not a string that means, no content needs to be updated
@@ -107,8 +108,9 @@ class Router
     // Return the RDP but do not release it to the public until we have installed new furniture
     protected function layoutContent()
     {
+        $layout = Application::$app->controller->layout;
         ob_start();
-        include_once Application::$ROOT_DIR . "/views/layouts/main.php";
+        include_once Application::$ROOT_DIR . "/views/layouts/$layout.php";
         return ob_get_clean();
     }
 
